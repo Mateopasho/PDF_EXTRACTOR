@@ -6,7 +6,7 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
-  // Only allow POST
+  // Allow only POST
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     res.status(405).json({ error: 'Method not allowed. Use POST.' });
@@ -22,11 +22,11 @@ export default async function handler(
   }
 
   try {
-    // Convert Base64 → Buffer
+    // Base64 → Buffer
     const buffer = Buffer.from(fileBase64, 'base64');
 
-    // Dynamic import so the full pdf-parse package (with its test files) is loaded at runtime
-    const pdfParse = (await import('pdf-parse')).default;
+    // Import the inner implementation to bypass the test‑file bug
+    const pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default;
 
     // Extract text
     const { text } = await pdfParse(buffer);
