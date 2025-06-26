@@ -1,6 +1,4 @@
-// api/parse-pdf.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import * as pdfParse from 'pdf-parse';
 
 type RequestBody = {
   fileBase64?: string;
@@ -28,7 +26,11 @@ export default async function handler(
     }
 
     const buffer = Buffer.from(fileBase64, 'base64');
-    const parsed = await pdfParse.default(buffer); // Safe usage of CommonJS default
+
+    // 🔧 Dynamically import to prevent test suite from triggering
+    const { default: pdfParse } = await import('pdf-parse');
+
+    const parsed = await pdfParse(buffer);
 
     res.status(200).json({ text: parsed.text });
   } catch (error: unknown) {
